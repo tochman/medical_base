@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { OpenAIEmbeddings } from "@langchain/openai";
+import { SupabaseVectorStore } from "@langchain/community/vectorstores/supabase";
 import { SupabaseHybridSearch } from "@langchain/community/retrievers/supabase";
 
 import dotenv from "dotenv";
@@ -15,30 +16,34 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 async function run() {
   const embeddings = new OpenAIEmbeddings({ openAIApiKey: openAIApiKey });
 
-  // const retriever = new SupabaseHybridSearch(embeddings, {
-  //   client: supabase,
-  //   similarityK: 20,
-  //   keywordK: 20,
-  //   tableName: "classifications",
-  //   similarityQueryName: "match_classifications",
-  //   keywordQueryName: "kw_match_classifications",
-  //   statementTimeout: 60000
-  // });
-
   const query =
-    "Avlägsnade kateter i intrakraniell injektionsutrustning. Dränage, avlägsnande av främmande kropp";
+    "Undersökte skallfraktur, La in epidural tryckmätare. lindring av akut cerebralt ödem"
 
-  try {
-    // const matchedDocs = await retriever.getRelevantDocuments(query);
-    let { data, error } = await supabase.rpc("kw_match_classifications", {
-      match_count: 10,
-      query_text: query,
+    const vectorStore = new SupabaseVectorStore(embeddings,
+      {
+        client: supabase,
+        tableName: 'classifications',
+        queryName: 'match_classifications',
+      }
+    )
+    const retriever = new SupabaseHybridSearch(embeddings, {
+      client: supabase,
+      //  Below are the defaults, expecting that you set up your supabase table and functions according to the guide above. Please change if necessary.
+      similarityK: 4,
+      keywordK: 4,
+      tableName: "classifications",
+      similarityQueryName: "match_classifications",
+      keywordQueryName: "kw_match_classifications",
     });
+  
+    try {
+      
+      const results = await retriever.getRelevantDocuments(query);
+      const resultOne = await vectorStore.similaritySearch(query)
+    
     if (error) console.error(error);
     else console.log(data);
-    // console.log("Search results:", matchedDocs);
-    // const matchedDocs = await vectorStore.similaritySearch(queryDocument);
-    // console.log("Matched documents:", matchedDocs);
+
   } catch (error) {
     console.error("Error querying the vector store:", error);
   }
