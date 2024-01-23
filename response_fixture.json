@@ -1,0 +1,14 @@
+{
+  "journal_entry": "The original input from the doctor corrected by the LLM, containing all the information",
+  "classification": [
+    {
+      "code": "AA001",
+      "description": "Lorem ipsum"
+    },
+    {
+      "code": "AA002",
+      "description": "Lorem ipsum..."
+    }
+  ]
+
+}

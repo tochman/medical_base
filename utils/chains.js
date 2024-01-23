@@ -10,8 +10,8 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const openAIApiKey = process.env.OPEN_AI_API_KEY;
-const supabaseUrl = process.env.SUPABASE_URL; // Use environment variable
-const supabaseKey = process.env.SUPABASE_KEY; // Use environment variable
+const supabaseUrl = process.env.SUPABASE_URL; 
+const supabaseKey = process.env.SUPABASE_KEY; 
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 const embeddings = new OpenAIEmbeddings({ openAIApiKey });
@@ -22,15 +22,7 @@ const vectorStore = new SupabaseVectorStore(embeddings, {
   queryName: "match_classifications",
 });
 
-const retriever2 = new SupabaseHybridSearch(embeddings, {
-  client: supabase,
-  //  Below are the defaults, expecting that you set up your supabase table and functions according to the guide above. Please change if necessary.
-  // similarityK: 20,
-  // keywordK: 20,
-  tableName: "classifications",
-  similarityQueryName: "match_classifications",
-  keywordQueryName: "kw_match_classifications",
-});
+
 
 const retriever = vectorStore.asRetriever();
 
@@ -44,7 +36,7 @@ const statementPrompt = PromptTemplate.fromTemplate(statementTemplate);
 const statementChain = statementPrompt
   .pipe(llm)
   .pipe(new StringOutputParser())
-  //.pipe(retriever);
+  .pipe(retriever);
 
 const response = await statementChain.invoke({
   statement:
