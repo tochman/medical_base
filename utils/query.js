@@ -10,11 +10,9 @@ const supabaseUrl = process.env.SUPABASE_URL; // Use environment variable
 const supabaseKey = process.env.SUPABASE_KEY; // Use environment variable
 const openAIApiKey = process.env.OPEN_AI_API_KEY;
 
-const supabase = createClient(supabaseUrl, supabaseKey, {
-  statement_timeout: 60000, // Set the timeout to 60 seconds (or adjust as needed)
-});
+const supabase = createClient(supabaseUrl, supabaseKey);
+const embeddings = new OpenAIEmbeddings({ openAIApiKey: openAIApiKey });
 async function run() {
-  const embeddings = new OpenAIEmbeddings({ openAIApiKey: openAIApiKey });
 
   const query =
     "Undersökte skallfraktur, La in epidural tryckmätare. lindring av akut cerebralt ödem"

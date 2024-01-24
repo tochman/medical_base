@@ -35,7 +35,6 @@ async function run() {
         text: row.slice(2, 10).join(" "),
       }),
       metadata: {
-
         classification: row[0],
         code: row[1],
         text: row.slice(2, 10).join(" "),
